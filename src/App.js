@@ -1,6 +1,5 @@
 import React from 'react';
 import Header from './Header';
-import IsLoadingAndError from './IsLoadingAndError';
 import Footer from './Footer';
 import {
   BrowserRouter as Router,
@@ -9,8 +8,9 @@ import {
 } from "react-router-dom";
 import BestBook from './BestBooks';
 import { withAuth0 } from '@auth0/auth0-react';
-import LoginButton from './Components/LoginButton';
 import Profile from './Components/Profile';
+import Login from './Login';
+
 class App extends React.Component {
 
   render() {
@@ -23,7 +23,7 @@ class App extends React.Component {
           <Header />
           <Switch>
             <Route exact path="/">
-              {this.props.auth0.isAuthenticated ? <BestBook /> : <LoginButton />}
+              {this.props.auth0.isAuthenticated ? <BestBook /> : <Login/>}
             </Route>
             <Route path="/Profile">
               <Profile />
