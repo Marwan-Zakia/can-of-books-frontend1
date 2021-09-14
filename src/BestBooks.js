@@ -1,21 +1,25 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Jumbotron from 'react-bootstrap/Jumbotron';
 import './BestBooks.css';
 import { withAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import Carousel from 'react-bootstrap/Carousel'
-
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Books from './Books';
+import Modal from 'react-bootstrap/Modal';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 class MyFavoriteBooks extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      booksArr: []
+      booksArr: [],
+      modalshow: false
     }
   }
   componentDidMount = () => {
     const { user } = this.props.auth0;
-    const email = 'email1@gmail.com';
+    const email = user.email;
     axios
       .get(`http://localhost:3001/books?email=${email}`)
       .then(result => {
@@ -27,41 +31,115 @@ class MyFavoriteBooks extends React.Component {
         console.log('error');
       })
   }
+  addBook = (event) => {
+    event.preventDefault();
+    const { user } = this.props.auth0;
+    const useremail = user.email;
+    const obj = {
+      authoremail: useremail,
+      title: event.target.title.value,
+      description: event.target.description.value,
+      status: event.target.status.value
+
+    }
+    console.log(obj)
+    axios
+      .post(`http://localhost:3001/addbook`, obj)
+      .then(result => {
+        this.setState({
+          booksArr: result.data
+        })
+      })
+      .catch(err => {
+        console.log('Error on adding data');
+      })
+  }
+
+  deleteBook = (id) => {
+    const { user } = this.props.auth0;
+    const email = user.email;
+    axios
+      .delete(`http://localhost:3001/deletebook/${id}?email=${email}`)
+      .then(result => {
+        this.setState({
+          booksArr: result.data
+        })
+      })
+      .catch(err => {
+        console.log('error in deleting a book');
+      })
+  }
+  handleShow = () => {
+    this.setState({
+      modalshow: true
+    })
+  }
+
+  handleClose = () => {
+    this.setState({
+      modalshow: false
+    })
+
+  }
   render() {
     return (
-      <Jumbotron>
-
-<h1>My Favorite Books</h1>
+      <>
+  <h1>My Favorite Books</h1>
         <p>
           This is a collection of my favorite books
         </p>
 
+        <Button variant="primary" onClick={this.handleShow}>
+          Add A Book
+        </Button>
 
-        {this.state.booksArr.map(item => {
-          return (
-            <div>
-<Carousel variant="dark">
-  <Carousel.Item>
-    <img
-         className="d-block w-100"
-         src={item.status}
-         alt={item.title}
-    />
-    <Carousel.Caption>
-    <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-    </Carousel.Caption>
-  </Carousel.Item>
+     
 
-</Carousel>
-            </div>
-          )
-        })
-        
-       
-  }
+        <Modal show={this.state.modalshow} onHide={this.handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Modal heading</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form onSubmit={this.addBook} >
+              <Form.Group className="mb-3">
+                <Form.Control type="text" placeholder="Enter the name of the book" name='title' />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Control type="text" placeholder="Enter the description of the book" name='description' />
+              </Form.Group>
 
-      </Jumbotron>
+
+              <Form.Group >
+                <Form.Label>Filter</Form.Label>
+                <Form.Control as="select" size="sm" custom name='status'>
+                  <option value="">All</option>
+                  <option value="life changing">life changing</option>
+                  <option value="top 5">top 5</option>
+                  <option value="Recommended to me">Recommended to me</option>
+
+                </Form.Control>
+              </Form.Group>
+
+
+              <Button variant="primary" type="submit">
+                Submit
+              </Button>
+            </Form>
+
+          </Modal.Body>
+        </Modal>
+        <Row>
+
+
+          {this.state.booksArr.map(item => {
+            return (
+              <Col>   <Books item={item} key={item.title} deleteBook={this.deleteBook} /> </Col>)
+          })}
+        </Row>
+      </>
+
+
+
     )
   }
 }
