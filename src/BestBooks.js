@@ -9,12 +9,18 @@ import Books from './Books';
 import Modal from 'react-bootstrap/Modal';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
+import UpdatedModel from './Components/UpdatedModel';
 class MyFavoriteBooks extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       booksArr: [],
-      modalshow: false
+      modalshow: false,
+      title : '',
+      description : '',
+      status : '',
+      bookid : '',
+      updatemodel: false
     }
   }
   componentDidMount = () => {
@@ -47,14 +53,13 @@ class MyFavoriteBooks extends React.Component {
       .post(`https://cobooks.herokuapp.com/addbook`, obj)
       .then(result => {
         this.setState({
-          booksArr: result.data
+          booksArr: result.data,
         })
       })
       .catch(err => {
         console.log('Error on adding data');
       })
   }
-
   deleteBook = (id) => {
     const { user } = this.props.auth0;
     const email = user.email;
@@ -71,16 +76,67 @@ class MyFavoriteBooks extends React.Component {
   }
   handleShow = () => {
     this.setState({
-      modalshow: true
+      modalshow: true,
     })
   }
 
   handleClose = () => {
     this.setState({
-      modalshow: false
+      modalshow: false, 
     })
 
   }
+  handleShow1 = () => {
+    this.setState({
+
+      updatemodel: true
+    })
+  }
+
+  handleClose1 = () => {
+    this.setState({
+     
+      updatemodel: false
+    })
+
+  }
+  
+  showUpdateForm = (item) => {
+    this.setState({
+      title : item.title,
+      description : item.description,
+      bookid : item._id,
+      status: item.status,
+      updatemodel: true
+
+    })
+  }
+  updateBook = (event) => {
+    event.preventDefault();
+    const { user } = this.props.auth0;
+    const useremail = user.email;
+    const obj = {
+      authoremail: useremail,
+      title: event.target.title.value,
+      description: event.target.description.value,
+      status: event.target.status.value,
+      updatemodel: false
+    }
+
+    axios
+    .put(`https://cobooks.herokuapp.com/updatebook/${this.state.bookid}`,obj)
+    .then(result =>{
+      this.setState({
+        booksArr:result.data,
+      
+      })
+    })
+    .catch(err=>{
+      console.log('error in updating the data');
+    })
+  }
+
+
   render() {
     return (
       <>
@@ -92,8 +148,6 @@ class MyFavoriteBooks extends React.Component {
         <Button variant="primary" onClick={this.handleShow}>
           Add A Book
         </Button>
-
-     
 
         <Modal show={this.state.modalshow} onHide={this.handleClose}>
           <Modal.Header closeButton>
@@ -128,12 +182,17 @@ class MyFavoriteBooks extends React.Component {
 
           </Modal.Body>
         </Modal>
+   <UpdatedModel   show = {this.state.updatemodel}
+       handleClose = {this.handleClose1}
+       title = {this.state.title}
+       catBreed = {this.state.description}
+       status = {this.state.status}
+       updateBook = {this.updateBook}
+    /> 
         <Row>
-
-
           {this.state.booksArr.map(item => {
             return (
-              <Col>   <Books item={item} key={item.title} deleteBook={this.deleteBook} /> </Col>)
+              <Col>   <Books item={item} key={item.title} deleteBook={this.deleteBook} model={this.handleShow1}  updateBook={this.showUpdateForm} /> </Col>)
           })}
         </Row>
       </>

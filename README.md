@@ -15,7 +15,7 @@ Clone this repo to your own account with the green "Use this template" button. T
 # Project Name
 
 **Author**: marwan Zakia
-**Version**: 1.0.0 
+**Version**: 4.0.0 
 
 ## Overview
 <!-- Provide a high level overview of what this application is and why you are building it, beyond the fact that it's an assignment for this class. (i.e. What's your problem domain?) -->
@@ -57,3 +57,13 @@ Start time: 2
 Finish time:4
 
 Actual time needed to complete:2hrs
+
+Name of feature: update
+
+Estimate of time needed to complete: 1hr
+
+Start time: 1
+
+Finish time:2
+
+Actual time needed to complete:1hr

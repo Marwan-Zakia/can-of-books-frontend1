@@ -20,7 +20,7 @@ class books extends Component {
              {this.props.item.status} 
             </Card.Text>
             <Button  onClick={() => this.props.deleteBook(this.props.item._id)} variant="primary">Go delete A Book</Button>
-           
+            <Button  onClick={() => this.props.updateBook(this.props.item)} variant="primary">Edit 📑</Button>
           </Card.Body>
         </Card>
 
